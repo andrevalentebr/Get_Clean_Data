@@ -52,51 +52,39 @@ dA <- rbind(tmp1, tmp2)         #dataActivity
 
 #### 2. Extracts only the measurements on the mean and standard deviation for each measurement.
 
-read features file for the names in dF
+read features.txt file and apply names for dF by second columns of features
 ```
 features <- read.table(file.path(dir_base, "features.txt"), header = FALSE)
-```
-apply names for dF by second columns of features
-```
 names(dF) <- features[, 2]
 ```
 subset dF by index on features with contains -mean() and -std() in 2 column
 ```
 dF <- dF[, grep("-(mean|std)\\(\\)", features[, 2])]
 ```
-remove () from names of dF
+remove () from names and apply lower case for all names of dF
 ```
 names(dF) <- gsub("\\(|\\)", "", names(dF))
-```
-lower case for all names of dF
-```
 names(dF) <- tolower(names(dF))
 ```
 
 #### 3. Uses descriptive activity names to name the activities in the data set.
 
-read de activity_labels.txt file
+read de activity_labels.txt file and remove de underline and low case on descriptions of activities
 ```
 activities <- read.table(file.path(dir_base, "activity_labels.txt"), header = FALSE)
-```
-remove de underline and low case on descriptions of activities
-```
 activities[, 2] <- gsub("_", "", tolower(as.character(activities[, 2])))
 ```
 link description in activities[,2], usind dA[,1] as index for 2 description 
 ```
 dA[,1] = activities[dA[,1], 2]
 ```
-assign name for dA
-```
-names(dA) <- "activity"
-```
 
 #### 4. Appropriately labels the data set with descriptive activity names.
-assign name for dS
+assign name for dA (Activity) and dS (Subject) 
 ```
+names(dA) <- "activity"
 names(dS) <- "subject"
-```
+``````
 merge all dataFrames in one named all_data
 ```
 all_data <- cbind(dS, dA, dF)
@@ -112,9 +100,9 @@ calculate mean by subject and activity groups using ddply function
 ```
 mean_data <- ddply(all_data, .(subject, activity), function(x) colMeans(x[, 3:66]))
 ```
-order by column subject and activity
+order dataFrame mean_data, by column subject and activity
 ```
-mean_data<-mean_data[order(mean_data$subject,mean_data$activity),]
+mean_data <- mean_data[order(mean_data$subject,mean_data$activity),]
 ```
 write tiny file with average by groups
 ```
